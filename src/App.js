@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 
+import ErrorBoundary from './ErrorBoundary';
 import Layout from './components/Layout/Layout';
 import Backdrop from './components/Backdrop/Backdrop';
 import Toolbar from './components/Toolbar/Toolbar';
@@ -191,6 +192,7 @@ class App extends Component {
       );
     }
     return (
+      <ErrorBoundary>
       <Fragment>
         {this.state.showBackdrop && (
           <Backdrop onClick={this.backdropClickHandler} />
@@ -218,6 +220,7 @@ class App extends Component {
         />
         {routes}
       </Fragment>
+      </ErrorBoundary>
     );
   }
 }
