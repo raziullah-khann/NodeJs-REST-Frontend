@@ -59,7 +59,12 @@ class Feed extends Component {
       })
       .then(resData => {
         this.setState({
-          posts: resData.posts,
+          posts: resData.posts.map(post => {
+            return {
+              ...post,
+              imagePath: post.imageUrl,
+            }
+          }),
           totalPosts: resData.totalItems,
           postsLoading: false
         });
@@ -114,7 +119,8 @@ class Feed extends Component {
     let url = 'http://localhost:8080/feed/post';
     let method = 'POST';
     if (this.state.editPost) {
-      url = 'URL';
+      url = 'http://localhost:8080/feed/post/' + this.state.editPost._id;
+      method = 'PUT'
     }
 
     fetch(url, {
@@ -125,7 +131,7 @@ class Feed extends Component {
         if (res.status !== 200 && res.status !== 201) {
           throw new Error('Creating or editing a post failed!');
         }
-        return res.json();
+        return res.json(); 
       })
       .then(resData => {
         console.log(resData);
@@ -141,13 +147,12 @@ class Feed extends Component {
           let updatedPosts = [...prevState.posts];
           if (prevState.editPost) {
             const postIndex = prevState.posts.findIndex(
-              p => p._id === prevState.editPost._id
+              (p) => p._id === prevState.editPost._id
             );
-            updatedPosts[postIndex] = post;}
-          // } else if (prevState.posts.length < 2) {
-          //   updatedPosts = prevState.posts.concat(post);
-          // }
-          updatedPosts = prevState.posts.concat(post);
+            updatedPosts[postIndex] = post;
+          } else {
+            updatedPosts.push(post);
+          }          
           return {
             posts: updatedPosts,
             isEditing: false,
@@ -166,7 +171,7 @@ class Feed extends Component {
         });
       });
   };
-
+  
   statusInputChangeHandler = (input, value) => {
     this.setState({ status: value });
   };
