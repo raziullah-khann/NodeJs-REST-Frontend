@@ -186,7 +186,7 @@ class Feed extends Component {
   deletePostHandler = postId => {
     this.setState({ postsLoading: true });
     fetch('http://localhost:8080/feed/post/' + postId, {
-      method: 'DELEtE',  
+      method: 'DELETE',  
       headers: {
         Authorization: 'Bearer '+this.props.token
       }
