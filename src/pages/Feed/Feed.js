@@ -36,13 +36,30 @@ class Feed extends Component {
       .catch(this.catchError);
 
     this.loadPosts();
-    openSocket('http://localhost:8080');
+    //The function openSocket() returns the socket object, which represents the connection between the client and the server.
+    const socket = openSocket('http://localhost:8080', {
+      transports: ["websocket"], // Use WebSocket directly if possible
+    });
+    socket.on('posts', data => {
+      console.log('Received socket event', data);
+      if(data.action === 'create'){
+        this.addPost(data.post);
+      }
+    })
+  }
+
+  componentWillUnmount() {
+    // Clean up the socket connection
+    if (this.socket) {
+      this.socket.off('posts'); // Remove specific listener
+      this.socket.disconnect(); // Close the connection
+    }
   }
 
   addPost = post => {
     this.setState(prevState => {
       const updatedPosts = [...prevState.posts];
-      if(prevState.potstPage === 1){
+      if(prevState.postPage === 1){
         updatedPosts.pop();
         updatedPosts.unshift(post);
       }
@@ -52,6 +69,12 @@ class Feed extends Component {
       }
     })
   }
+  // addPost = (post) => {
+  //   this.setState((prevState) => ({
+  //     posts: [post, ...prevState.posts],
+  //     totalPosts: prevState.totalPosts + 1,
+  //   }));
+  // };
 
   loadPosts = direction => {
     if (direction) {
@@ -173,9 +196,10 @@ class Feed extends Component {
               (p) => p._id === prevState.editPost._id
             );
             updatedPosts[postIndex] = post;
-          } else {
-            updatedPosts.push(post);
-          }          
+          } 
+          // else {
+          //   updatedPosts.push(post); here we use socket io then we crete product in componentDidMount thats whe here we comment
+          // }          
           return {
             posts: updatedPosts,
             isEditing: false,
