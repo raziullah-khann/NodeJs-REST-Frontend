@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from '../../Image/Image';
+// import Image from '../../Image/Image';
 
 import Button from '../../Button/Button';
 import './Post.css';
