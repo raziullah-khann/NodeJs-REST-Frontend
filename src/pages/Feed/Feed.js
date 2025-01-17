@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import openSocket from 'socket.io-client';
 
 import Post from '../../components/Feed/Post/Post';
 import Button from '../../components/Button/Button';
@@ -40,20 +39,6 @@ class Feed extends Component {
       .catch(this.catchError);
 
     this.loadPosts();
-    //The function openSocket() returns the socket object, which represents the connection between the client and the server.
-    const socket = openSocket('http://localhost:8080', {
-      transports: ["websocket"], // Use WebSocket directly if possible
-    });
-    socket.on('posts', data => {
-      console.log('Received socket event', data);
-      if(data.action === 'create'){
-        this.addPost(data.post);
-      } else if(data.action === 'update'){
-        this.updatePost(data.post);
-      } else if(data.action === 'delete'){
-        this.loadPosts();
-      }
-    })
   }
 
   componentWillUnmount() {
@@ -63,40 +48,6 @@ class Feed extends Component {
       this.socket.disconnect(); // Close the connection
     }
   }
-
-  addPost = post => {
-    this.setState(prevState => {
-      const updatedPosts = [...prevState.posts];
-      if(prevState.postPage === 1){
-        updatedPosts.pop();
-        updatedPosts.unshift(post);
-      }
-      return {
-        posts: updatedPosts,
-        totalPosts: prevState.totalPosts + 1
-      }
-    })
-  }
-
-  updatePost = post => {
-    this.setState(prevState => {
-      const updatedPosts = [...prevState.posts];
-      const updatedPostIndex = updatedPosts.findIndex(p=> p._id === post._id);
-      if(updatedPostIndex > -1){
-        updatedPosts[updatedPostIndex] = post;
-      }
-      return {
-        posts: updatedPosts,
-      }
-    })
-  }
-
-  // addPost = (post) => {
-  //   this.setState((prevState) => ({
-  //     posts: [post, ...prevState.posts],
-  //     totalPosts: prevState.totalPosts + 1,
-  //   }));
-  // };
 
   loadPosts = direction => {
     if (direction) {
