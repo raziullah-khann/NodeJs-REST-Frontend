@@ -122,7 +122,7 @@ class App extends Component {
             email: "${authData.signupForm.email.value}",
             password: "${authData.signupForm.password.value}"
           }) {
-            id
+            _id
             email
           }
         }
