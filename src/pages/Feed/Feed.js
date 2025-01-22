@@ -195,7 +195,7 @@ class Feed extends Component {
         const post = {
           _id: resData.data.createPost._id,
           title: resData.data.createPost.title,
-          content: resData.data.createPostcontent,
+          content: resData.data.createPost.content,
           creator: resData.data.createPost.creator,
           createdAt: resData.data.createPost.createdAt,
         };
