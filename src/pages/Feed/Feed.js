@@ -157,35 +157,49 @@ class Feed extends Component {
       editLoading: true,
     });
     const formData = new FormData();
-    formData.append("title", postData.title);
-    formData.append("content", postData.content);
     formData.append("image", postData.image);
+    if(this.state.editPost){
+      formData.append('oldPath', this.state.editPost.imageUrl);
+    }
     // Set up data (with image!)
-    let graphqlQuery = {
-      query: `
-        mutation {
-          createPost(postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "some url"}) {
-            _id
-            title
-            content
-            creator {
-              name
-            }
-            createdAt
-          }
-        }
-      `,
-    };
-
-    fetch("http://localhost:8080/graphql", {
-      method: "POST",
-      body: JSON.stringify(graphqlQuery),
+    fetch('http://localhost:8080/post-image', {
+      method: 'PUT',
+      body: formData,
       headers: {
         Authorization: "Bearer " + this.props.token,
-        'Content-Type': 'application/json'
       },
-    })
-      .then((res) => {
+    }).then(res => res.json()).then(fileResData => {
+      console.log('fileResData hai',fileResData)
+      const imageUrl = fileResData.filePath;
+      let graphqlQuery = {
+        query: `
+          mutation {
+            createPost(postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: ${JSON.stringify(imageUrl)}}) {
+              _id
+              title
+              content
+              imageUrl
+              creator {
+                name
+              }
+              createdAt
+            }
+          }
+        `,
+      };
+  
+      return fetch("http://localhost:8080/graphql", {
+        method: "POST",
+        body: JSON.stringify(graphqlQuery),
+        headers: {
+          Authorization: "Bearer " + this.props.token,
+          'Content-Type': 'application/json'
+        },
+      })
+    }).then((res) => {
+      if (!res.ok) {
+        throw new Error("Failed to upload image!");
+      }
         return res.json();
       })
       .then((resData) => {
@@ -205,6 +219,7 @@ class Feed extends Component {
           content: resData.data.createPost.content,
           creator: resData.data.createPost.creator,
           createdAt: resData.data.createPost.createdAt,
+          imagePath: resData.data.createPost.imageUrl,
         };
         console.log('POst hai jo setstate me jayega', post);
         
